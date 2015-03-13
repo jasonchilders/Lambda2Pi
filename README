@@ -5,9 +5,16 @@ A project for exploring conversion of lambda-calculus terms to pi-calculus proce
 Requirements for running Lambda2Pi.py
 1. /usr/local/bin/python3 should be available (might work on python 2, but tested against python3)
 
-2. To run, type the following at the cmdline:
+2. To run, type the following at the cmdline for help on how to execute:
     a. $ ./Lambda2Pi --help
 or
     b. $ python3 Lambda2Pi --help
 
 This will give you an idea of how to execute the program.
+
+3. Try some examples...
+    a. $ ./Lambda2Pi 'x'                                                // x
+    b. $ ./Lambda2Pi.py 'lambda x: x'                                   // I
+    c. $ ./Lambda2Pi.py 'lambda x: (lambda y: x)'                       // K
+    d. $ ./Lambda2Pi.py 'lambda x: lambda y: lambda z: x(z)(y(z))'      // S
+

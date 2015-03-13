@@ -10,8 +10,6 @@ I = 'lambda x: x'
 K = 'lambda x: (lambda y: x)'
 
 S = 'lambda x: lambda y: lambda z: x(z)(y(z))'
-#S = 'lambda x: lambda y: lambda z: (x(z))(y(z))'
-#S = 'lambda x: lambda y: lambda z: ((x(z))(y(z)))'
 
 
 class TestLamdaTerm(unittest.TestCase):
@@ -20,12 +18,17 @@ class TestLamdaTerm(unittest.TestCase):
     def test_lambdaTermx(self):
         print('testing x')
         lt = LambdaTerm('x')
-        print(lt.astTerms)
+        self.assertEqual(lt.term, 'x')
+        print('astTerms: ' + str(lt.astTerms))
+        self.assertEqual(lt.astTerms, [{'_var_': 'x'}])
+        self.assertEqual(lt.piProcessExpression, 'x!a')
+
 
 
     def test_lambdaTermI(self):
         print('testing I')
         lt = LambdaTerm(I)
+        self.assertEqual(lt.astTerms, [{'x': 'x'}])
         print(lt.astTerms)
         self.assertEqual(len(lt.astTerms), 1, 'Stack should have a depth equal to 1.')
         self.assertEqual(len(lt.astTerms), 1, 'keys length should be equal to 1.')
@@ -34,11 +37,15 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(key, 'x', "the first key should equal 'x'.")
         value = term.get(key)
         self.assertEqual(value, 'x', "the value of the lambda term should equal 'x'")
+        print(lt.piProcessExpression)
+        self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[x!c](b)')
+
 
 
     def test_lambdaTermK(self):
         print('testing K')
         lt = LambdaTerm(K)
+        self.assertEqual(lt.astTerms, [{'x': 'lambda y: x'}, {'y': 'x'}])
         print(lt.astTerms)
         self.assertEqual(len(lt.astTerms), 2, 'Stack should have a depth equal to 2.')
         term1 = lt.astTerms[0]
@@ -53,10 +60,15 @@ class TestLamdaTerm(unittest.TestCase):
         value2 = term2.get(key2)
         self.assertEqual(value2, 'x', "the value of the 2nd lambda term should equal 'x'")
 
+        print(lt.piProcessExpression)
+        self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[x!e](d)](b)')
+
 
     def test_lambdaTermS(self):
         print('testing S')
         lt = LambdaTerm(S)
+        self.assertEqual(lt.astTerms, [{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
+                                       {'z': 'x(z)(y(z))'}])
         print(lt.astTerms)
         self.assertEqual(len(lt.astTerms), 3, 'Stack should have a depth equal to 3.')
 
@@ -77,6 +89,9 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(key3, 'z', "the 3nd key for the 3nd term should equal 'z'.")
         value3 = term3.get(key3)
         self.assertEqual(value3, 'x(z)(y(z))', "the value of the 2nd lambda term should equal 'x(z)(y(z))'")
+
+        print(lt.piProcessExpression)
+        self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
 
 
     def test_lambdaTermKI(self):

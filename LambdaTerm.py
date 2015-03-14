@@ -76,17 +76,26 @@ class LambdaTerm:
 
     @staticmethod
     def reset():
-        LambdaTerm.reset
+        LambdaTerm.resetChannels()
+        LambdaTerm.resetAgents()
 
 
     @staticmethod
     def resetChannels():
-        pass
+        channelKeys = sorted(LambdaTerm.CHANNELS.items(), key=operator.itemgetter(0))
+        channel = ''
+        for ck in channelKeys:
+            channel = ck[0]
+            LambdaTerm.CHANNELS[channel] = 0
 
 
     @staticmethod
     def resetAgents():
-        pass
+        agentKeys = sorted(LambdaTerm.AGENTS.items(), key=operator.itemgetter(0))
+        agent = ''
+        for ak in agentKeys:
+            agent = ak[0]
+            LambdaTerm.AGENTS[agent] = 0
 
 
     @staticmethod

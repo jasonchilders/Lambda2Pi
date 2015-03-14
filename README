@@ -26,7 +26,7 @@ I've taken a couple of shortcuts in the interest of time.  Trivial to resolve th
  translation rule for that is.
 
 
-To run the unittests do the following at the cli:
+To run the unittests do the following in the cli:
 
     $ python3 -m unittest TestLambdaTerm
 

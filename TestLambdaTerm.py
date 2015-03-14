@@ -14,7 +14,7 @@ S = 'lambda x: lambda y: lambda z: x(z)(y(z))'
 debug = False
 
 
-class TestLamdaTerm(unittest.TestCase):
+class TestLambdaTerm(unittest.TestCase):
 
 
     def setUp(self):
@@ -25,7 +25,7 @@ class TestLamdaTerm(unittest.TestCase):
 
 
     def test_lambdaTermx(self):
-        print('testing x')
+        if debug: print('testing x')
         lt = LambdaTerm('x')
         self.assertEqual(lt.term, 'x')
         print('lambda-term: ' + lt.term)
@@ -34,10 +34,11 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(lt.piProcessExpression, 'x!a')
         print('>  expected: ' + 'x!a')
         print('>>   actual: ' + lt.piProcessExpression)
+        print('--------')
 
 
     def test_lambdaTermI(self):
-        print('testing I')
+        if debug: print('testing I')
         lt = LambdaTerm(I)
         self.assertEqual(lt.astTerms, [{'x': 'x'}])
         print('lambda-term - I: ' + lt.term)
@@ -53,6 +54,7 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[x!c](b)')
         print('>      expected: ' + 'a?x.a?b.[x!c](b)')
         print('>>       actual: ' + lt.piProcessExpression)
+        print('--------')
 
 
     def test_lambdaTermK(self):
@@ -78,10 +80,11 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[x!e](d)](b)')
         print('>      expected: ' + 'a?x.a?b.[c?y.c?d.[x!e](d)](b)')
         print('>>       actual: ' + lt.piProcessExpression)
+        print('--------')
 
 
     def test_lambdaTermS(self):
-        print('testing S')
+        if debug: print('testing S')
         lt = LambdaTerm(S)
         self.assertEqual(lt.astTerms, [{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
                                        {'z': 'x(z)(y(z))'}])
@@ -111,10 +114,11 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
         print('>      expected: ' + 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
         print('>>       actual: ' + lt.piProcessExpression)
+        print('--------')
 
 
     def test_lambdaTermKI(self):
-        print('testing KI')
+        if debug: print('testing KI')
         lt = LambdaTerm('('+K+')'+'('+I+')')
         self.assertEqual(lt.astTerms, [[{'x': 'lambda y: x'}, {'y': 'x'}], [{'x': 'x'}]])
         print('lambda-term - KI: ' + lt.term)
@@ -126,10 +130,11 @@ class TestLamdaTerm(unittest.TestCase):
         print('>       expected: ' + 'new(a,b).(([e?x.e?f.[g?y.g?h.[x!i](h)](f)](a)) | (a!b.b!c) |'
                                      ' *((b?d).[j?x.j?k.[x!l](k)](d))')
         print('>>        actual: ' + lt.piProcessExpression)
+        print('--------')
 
 
     def test_lambdaTermSK(self):
-        print('testing SK')
+        if debug: print('testing SK')
         lt = LambdaTerm('('+S+')'+'('+K+')')
         self.assertEqual(lt.astTerms, [[{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
                                         {'z': 'x(z)(y(z))'}], [{'x': 'lambda y: x'}, {'y': 'x'}]])
@@ -142,6 +147,7 @@ class TestLamdaTerm(unittest.TestCase):
         print('>       expected: ' + 'new(a,b).(([e?x.e?f.[g?y.g?h.[i?z.i?j.[x(z)(y(z))!k](j)](h)](f)](a)) | (a!b.b!c)'
                                      ' | *((b?d).[l?x.l?m.[n?y.n?o.[x!p](o)](m)](d))')
         print('>>        actual: ' + lt.piProcessExpression)
+        print('--------')
 
 
     #TODO: wire this up
@@ -158,6 +164,7 @@ class TestLamdaTerm(unittest.TestCase):
         #self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
         print('>        expected: ' + 'tbd - not yet wired up')
         print('>>         actual: ' + lt.piProcessExpression)
+        print('--------')
 
 
     def test_lambdaChannelsLength(self):
@@ -199,10 +206,10 @@ class TestLamdaTerm(unittest.TestCase):
         if debug: print('agent: ' + agent + ', agentReserved: ' + str(agentReserved))
 
 
-    def test_lambdaI2Pi(self):
-        if debug: print('testing I to Pi')
-        lt = LambdaTerm(I)
-        print(lt.astTerms)
+    # def test_lambdaI2Pi(self):
+    #     if debug: print('testing I to Pi')
+    #     lt = LambdaTerm(I)
+    #     if debug: print(lt.astTerms)
 
 
 if __name__ == '__main__':

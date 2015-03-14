@@ -26,7 +26,7 @@ class LambdaTerm:
             ------------------------------------------------------------------------------------------------------------
             |     λx M              |    p?x.p?q.[M](q)         | Given a channel p, obtain the value of x and the     |
             |                       |                           | communication channel q; call agent [M] on channel   |
-                                    |                           | q                                                    |
+            |                       |                           | q                                                    |
             ------------------------------------------------------------------------------------------------------------
             |       x               |        x!p                | A variable, when used, just publishes its channel    |
             ------------------------------------------------------------------------------------------------------------
@@ -64,6 +64,8 @@ class LambdaTerm:
 
     def __init__(self, expr):
         try:
+            self.expressionKeys = []
+            self.expressionValues = []
             self.term = expr
             self.astTerms = LambdaTerm.parseLambdaTerm(expr)
             self.createExpressionMap()

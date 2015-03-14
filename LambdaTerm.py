@@ -75,6 +75,21 @@ class LambdaTerm:
 
 
     @staticmethod
+    def reset():
+        LambdaTerm.reset
+
+
+    @staticmethod
+    def resetChannels():
+        pass
+
+
+    @staticmethod
+    def resetAgents():
+        pass
+
+
+    @staticmethod
     def parseLambdaTerm(lambdaTerm):
         lstack = []
         lambdaTerm = str(lambdaTerm).strip()

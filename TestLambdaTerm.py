@@ -11,25 +11,32 @@ K = 'lambda x: (lambda y: x)'
 
 S = 'lambda x: lambda y: lambda z: x(z)(y(z))'
 
+debug = False
+
 
 class TestLamdaTerm(unittest.TestCase):
 
 
     def test_lambdaTermx(self):
-        print('testing x')
+        if debug: print('testing x')
         lt = LambdaTerm('x')
         self.assertEqual(lt.term, 'x')
-        print('astTerms: ' + str(lt.astTerms))
+        print('lambda-term: ' + lt.term)
+        if debug: print('astTerms: ' + str(lt.astTerms))
         self.assertEqual(lt.astTerms, [{'_var_': 'x'}])
         self.assertEqual(lt.piProcessExpression, 'x!a')
+        print('>  expected: ' + 'x!a')
+        print('>>   actual: ' + lt.piProcessExpression)
+
 
 
 
     def test_lambdaTermI(self):
-        print('testing I')
+        if debug: print('testing I')
         lt = LambdaTerm(I)
         self.assertEqual(lt.astTerms, [{'x': 'x'}])
-        print(lt.astTerms)
+        print('lambda-term - I: ' + lt.term)
+        if debug: print(lt.astTerms)
         self.assertEqual(len(lt.astTerms), 1, 'Stack should have a depth equal to 1.')
         self.assertEqual(len(lt.astTerms), 1, 'keys length should be equal to 1.')
         term = lt.astTerms.pop()
@@ -37,8 +44,10 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(key, 'x', "the first key should equal 'x'.")
         value = term.get(key)
         self.assertEqual(value, 'x', "the value of the lambda term should equal 'x'")
-        print(lt.piProcessExpression)
+        if debug: print(lt.piProcessExpression)
         self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[x!c](b)')
+        print('>      expected: ' + 'a?x.a?b.[x!c](b)')
+        print('>>       actual: ' + lt.piProcessExpression)
 
 
 
@@ -46,7 +55,8 @@ class TestLamdaTerm(unittest.TestCase):
         print('testing K')
         lt = LambdaTerm(K)
         self.assertEqual(lt.astTerms, [{'x': 'lambda y: x'}, {'y': 'x'}])
-        print(lt.astTerms)
+        print('lambda-term - K: ' + lt.term)
+        if debug: print(lt.astTerms)
         self.assertEqual(len(lt.astTerms), 2, 'Stack should have a depth equal to 2.')
         term1 = lt.astTerms[0]
         key1 = list(term1.keys())[0]
@@ -60,16 +70,19 @@ class TestLamdaTerm(unittest.TestCase):
         value2 = term2.get(key2)
         self.assertEqual(value2, 'x', "the value of the 2nd lambda term should equal 'x'")
 
-        print(lt.piProcessExpression)
+        if debug: print(lt.piProcessExpression)
         self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[x!e](d)](b)')
+        print('>      expected: ' + 'a?x.a?b.[c?y.c?d.[x!e](d)](b)')
+        print('>>       actual: ' + lt.piProcessExpression)
 
 
     def test_lambdaTermS(self):
-        print('testing S')
+        if debug: print('testing S')
         lt = LambdaTerm(S)
         self.assertEqual(lt.astTerms, [{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
                                        {'z': 'x(z)(y(z))'}])
-        print(lt.astTerms)
+        print('lambda-term - S: ' + lt.term)
+        if debug: print(lt.astTerms)
         self.assertEqual(len(lt.astTerms), 3, 'Stack should have a depth equal to 3.')
 
         term1 = lt.astTerms[0]
@@ -90,70 +103,99 @@ class TestLamdaTerm(unittest.TestCase):
         value3 = term3.get(key3)
         self.assertEqual(value3, 'x(z)(y(z))', "the value of the 2nd lambda term should equal 'x(z)(y(z))'")
 
-        print(lt.piProcessExpression)
+        if debug: print(lt.piProcessExpression)
         self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
+        print('>      expected: ' + 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
+        print('>>       actual: ' + lt.piProcessExpression)
 
 
     def test_lambdaTermKI(self):
-        print('testing KI')
+        if debug: print('testing KI')
         lt = LambdaTerm('('+K+')'+'('+I+')')
-        print(lt.astTerms)
+        self.assertEqual(lt.astTerms, [[{'x': 'lambda y: x'}, {'y': 'x'}], [{'x': 'x'}]])
+        print('lambda-term - KI: ' + lt.term)
+        if debug: print(lt.astTerms)
+        if debug: print(lt.astTerms)
+        if debug: print(lt.piProcessExpression)
+        self.assertEqual(lt.piProcessExpression, 'new(a,b).(([e?x.e?f.[g?y.g?h.[x!i](h)](f)](a)) | (a!b.b!c) |'
+                                                 ' *((b?d).[j?x.j?k.[x!l](k)](d))')
+        print('>       expected: ' + 'new(a,b).(([e?x.e?f.[g?y.g?h.[x!i](h)](f)](a)) | (a!b.b!c) |'
+                                     ' *((b?d).[j?x.j?k.[x!l](k)](d))')
+        print('>>        actual: ' + lt.piProcessExpression)
 
 
     def test_lambdaTermSK(self):
-        print('testing SK')
+        if debug: print('testing SK')
         lt = LambdaTerm('('+S+')'+'('+K+')')
-        print(lt.astTerms)
+        self.assertEqual(lt.astTerms, [[{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
+                                        {'z': 'x(z)(y(z))'}], [{'x': 'lambda y: x'}, {'y': 'x'}]])
+        print('lambda-term - SK: ' + lt.term)
+        #print(lt.astTerms)
+        if debug: print(lt.astTerms)
+        if debug: print(lt.piProcessExpression)
+        self.assertEqual(lt.piProcessExpression, 'new(a,b).(([e?x.e?f.[g?y.g?h.[i?z.i?j.[x(z)(y(z))!k](j)](h)](f)](a))'
+                                                 ' | (a!b.b!c) | *((b?d).[l?x.l?m.[n?y.n?o.[x!p](o)](m)](d))')
+        print('>       expected: ' + 'new(a,b).(([e?x.e?f.[g?y.g?h.[i?z.i?j.[x(z)(y(z))!k](j)](h)](f)](a)) | (a!b.b!c)'
+                                     ' | *((b?d).[l?x.l?m.[n?y.n?o.[x!p](o)](m)](d))')
+        print('>>        actual: ' + lt.piProcessExpression)
 
 
+    #TODO: wire this up
     def test_lambdaTermSKI(self):
-        print('testing SKI')
+        if debug: print('testing SKI')
         lt = LambdaTerm('('+S+')'+'('+K+')'+'('+I+')')
-        print(lt.astTerms)
+        self.assertEqual(lt.astTerms, [[{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
+                                        {'z': 'x(z)(y(z))'}], [{'x': 'lambda y: x'}, {'y': 'x'}], [{'x': 'x'}]])
+        print('lambda-term - SKI: ' + lt.term)
+        #print(lt.astTerms)
+        if debug: print(lt.astTerms)
+        if debug: print(lt.piProcessExpression)
+        #self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
+        print('>        expected: ' + 'tbd')
+        print('>>         actual: ' + lt.piProcessExpression)
 
 
     def test_lambdaChannelsLength(self):
-        print('testing CHANNELS length')
+        if debug: print('testing CHANNELS length')
         channelsLength = len(LambdaTerm.CHANNELS)
         self.assertEqual(channelsLength, 26, "only 26 channels should be available")
 
 
     def test_getNewChannel(self):
-        print('testing newChannel()')
+        if debug: print('testing newChannel()')
         channel = LambdaTerm.newChannel()
-        #ltChannels = LambdaTerm.CHANNELS
         channelReserved = LambdaTerm.CHANNELS.get(channel)
-        print('channel: ' + channel + ', channelReserved: '+ str(channelReserved))
+        if debug: print('channel: ' + channel + ', channelReserved: '+ str(channelReserved))
         self.assertEqual(channelReserved, 1, 'channel should be reserved (ie. = 1)')
         # get another new agent and assert it worked correctly too
         channel = LambdaTerm.newChannel()
         #self.assertEqual(channel, LambdaTerm.CHANNELS[1], 'channel should be the 2nd value in CHANNELS')
         channelReserved = LambdaTerm.CHANNELS.get(channel)
         self.assertEqual(channelReserved, 1, 'channel should be reserved (ie. = 1)')
-        print('channel: ' + channel + ', channelReserved: '+ str(channelReserved))
+        if debug: print('channel: ' + channel + ', channelReserved: '+ str(channelReserved))
 
 
     def test_lambdaAgentsLength(self):
-        print('testing AGENTS length')
+        if debug: print('testing AGENTS length')
         agentsLength = len(LambdaTerm.AGENTS)
         self.assertEqual(agentsLength, 26, "only 26 agents should be available")
 
 
     def test_getNewAgent(self):
-        print('testing newAgent()')
+        if debug: print('testing newAgent()')
         agent = LambdaTerm.newAgent()
         agentReserved = LambdaTerm.AGENTS.get(agent)
-        print('agent: ' + agent + ', agentReserved: ' + str(agentReserved))
+        if debug: print('agent: ' + agent + ', agentReserved: ' + str(agentReserved))
         self.assertEqual(agentReserved, 1, 'agent should be reserved (ie. = 1)')
         # get another new agent and assert it worked correctly too
         agent = LambdaTerm.newAgent()
         agentReserved = LambdaTerm.AGENTS.get(agent)
         self.assertEqual(agentReserved, 1, 'agent should be reserved (ie. = 1)')
-        print('agent: ' + agent + ', agentReserved: ' + str(agentReserved))
+        if debug: print('agent: ' + agent + ', agentReserved: ' + str(agentReserved))
 
 
     def test_lambdaI2Pi(self):
-        print('testing I to Pi')
+        if debug: print('testing I to Pi')
         lt = LambdaTerm(I)
         print(lt.astTerms)
 

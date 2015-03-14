@@ -17,6 +17,10 @@ debug = False
 class TestLamdaTerm(unittest.TestCase):
 
 
+    def setUp(self):
+        LambdaTerm.reset()
+
+
     def test_lambdaTermx(self):
         if debug: print('testing x')
         lt = LambdaTerm('x')
@@ -148,7 +152,7 @@ class TestLamdaTerm(unittest.TestCase):
         if debug: print(lt.astTerms)
         if debug: print(lt.piProcessExpression)
         #self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
-        print('>        expected: ' + 'tbd')
+        print('>        expected: ' + 'tbd - not yet wired up')
         print('>>         actual: ' + lt.piProcessExpression)
 
 

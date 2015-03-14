@@ -7,6 +7,7 @@ import argparse
 
 from LambdaTerm import LambdaTerm
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("lambdaterm", type=str, help="a lambda term [ex: 'lambda x: x']")
 parser.add_argument("-d", "--debug", help="show debug info", action="store_true")
@@ -30,4 +31,3 @@ def main(args):
 if __name__ == '__main__':
     main(args)
     exit()
-

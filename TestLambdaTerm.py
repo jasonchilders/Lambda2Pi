@@ -29,8 +29,6 @@ class TestLamdaTerm(unittest.TestCase):
         print('>>   actual: ' + lt.piProcessExpression)
 
 
-
-
     def test_lambdaTermI(self):
         if debug: print('testing I')
         lt = LambdaTerm(I)
@@ -48,7 +46,6 @@ class TestLamdaTerm(unittest.TestCase):
         self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[x!c](b)')
         print('>      expected: ' + 'a?x.a?b.[x!c](b)')
         print('>>       actual: ' + lt.piProcessExpression)
-
 
 
     def test_lambdaTermK(self):
@@ -198,8 +195,6 @@ class TestLamdaTerm(unittest.TestCase):
         if debug: print('testing I to Pi')
         lt = LambdaTerm(I)
         print(lt.astTerms)
-
-
 
 
 if __name__ == '__main__':

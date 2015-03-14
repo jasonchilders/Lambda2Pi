@@ -31,7 +31,7 @@ class TestLambdaTerm(unittest.TestCase):
         print('lambda-term: ' + lt.term)
         if debug: print('astTerms: ' + str(lt.astTerms))
         self.assertEqual(lt.astTerms, [{'_var_': 'x'}])
-        self.assertEqual(lt.piProcessExpression, 'x!a')
+        self.assertEqual('x!a', lt.piProcessExpression)
         print('>  expected: ' + 'x!a')
         print('>>   actual: ' + lt.piProcessExpression)
         print('--------')
@@ -51,8 +51,8 @@ class TestLambdaTerm(unittest.TestCase):
         value = term.get(key)
         self.assertEqual(value, 'x', "the value of the lambda term should equal 'x'")
         if debug: print(lt.piProcessExpression)
-        self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[x!c](b)')
-        print('>      expected: ' + 'a?x.a?b.[x!c](b)')
+        self.assertEqual('a?x.a?b.x!c(b)', lt.piProcessExpression)
+        print('>      expected: ' + 'a?x.a?b.x!c(b)')
         print('>>       actual: ' + lt.piProcessExpression)
         print('--------')
 
@@ -77,8 +77,8 @@ class TestLambdaTerm(unittest.TestCase):
         self.assertEqual(value2, 'x', "the value of the 2nd lambda term should equal 'x'")
 
         if debug: print(lt.piProcessExpression)
-        self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[x!e](d)](b)')
-        print('>      expected: ' + 'a?x.a?b.[c?y.c?d.[x!e](d)](b)')
+        self.assertEqual('a?x.a?b.c?y.c?d.x!e(d)(b)', lt.piProcessExpression)
+        print('>      expected: ' + 'a?x.a?b.c?y.c?d.x!e(d)(b)')
         print('>>       actual: ' + lt.piProcessExpression)
         print('--------')
 
@@ -111,8 +111,8 @@ class TestLambdaTerm(unittest.TestCase):
         self.assertEqual(value3, 'x(z)(y(z))', "the value of the 2nd lambda term should equal 'x(z)(y(z))'")
 
         if debug: print(lt.piProcessExpression)
-        self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
-        print('>      expected: ' + 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
+        self.assertEqual('a?x.a?b.c?y.c?d.e?z.e?f.x(z)(y(z))!g(f)(d)(b)', lt.piProcessExpression)
+        print('>      expected: ' + 'a?x.a?b.c?y.c?d.e?z.e?f.x(z)(y(z))!g(f)(d)(b)')
         print('>>       actual: ' + lt.piProcessExpression)
         print('--------')
 
@@ -125,10 +125,10 @@ class TestLambdaTerm(unittest.TestCase):
         if debug: print(lt.astTerms)
         if debug: print(lt.astTerms)
         if debug: print(lt.piProcessExpression)
-        self.assertEqual(lt.piProcessExpression, 'new(a,b).(([e?x.e?f.[g?y.g?h.[x!i](h)](f)](a)) | (a!b.b!c) |'
-                                                 ' *((b?d).[j?x.j?k.[x!l](k)](d))')
-        print('>       expected: ' + 'new(a,b).(([e?x.e?f.[g?y.g?h.[x!i](h)](f)](a)) | (a!b.b!c) |'
-                                     ' *((b?d).[j?x.j?k.[x!l](k)](d))')
+        self.assertEqual('new(a,b).((e?x.e?f.g?y.g?h.x!i(h)(f)(a)) | (a!b.b!c) | *((b?d).j?x.j?k.x!l(k)(d))',
+                         lt.piProcessExpression)
+        print('>       expected: ' + 'new(a,b).((e?x.e?f.g?y.g?h.x!i(h)(f)(a)) | (a!b.b!c) | '
+                                     '*((b?d).j?x.j?k.x!l(k)(d))')
         print('>>        actual: ' + lt.piProcessExpression)
         print('--------')
 
@@ -139,13 +139,12 @@ class TestLambdaTerm(unittest.TestCase):
         self.assertEqual(lt.astTerms, [[{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
                                         {'z': 'x(z)(y(z))'}], [{'x': 'lambda y: x'}, {'y': 'x'}]])
         print('lambda-term - SK: ' + lt.term)
-        #print(lt.astTerms)
         if debug: print(lt.astTerms)
         if debug: print(lt.piProcessExpression)
-        self.assertEqual(lt.piProcessExpression, 'new(a,b).(([e?x.e?f.[g?y.g?h.[i?z.i?j.[x(z)(y(z))!k](j)](h)](f)](a))'
-                                                 ' | (a!b.b!c) | *((b?d).[l?x.l?m.[n?y.n?o.[x!p](o)](m)](d))')
-        print('>       expected: ' + 'new(a,b).(([e?x.e?f.[g?y.g?h.[i?z.i?j.[x(z)(y(z))!k](j)](h)](f)](a)) | (a!b.b!c)'
-                                     ' | *((b?d).[l?x.l?m.[n?y.n?o.[x!p](o)](m)](d))')
+        self.assertEqual('new(a,b).((e?x.e?f.g?y.g?h.i?z.i?j.x(z)(y(z))!k(j)(h)(f)(a)) | (a!b.b!c) | '
+                         '*((b?d).l?x.l?m.n?y.n?o.x!p(o)(m)(d))', lt.piProcessExpression)
+        print('>       expected: ' + 'new(a,b).((e?x.e?f.g?y.g?h.i?z.i?j.x(z)(y(z))!k(j)(h)(f)(a)) | (a!b.b!c)'
+                                     ' | *((b?d).l?x.l?m.n?y.n?o.x!p(o)(m)(d))')
         print('>>        actual: ' + lt.piProcessExpression)
         print('--------')
 
@@ -158,10 +157,9 @@ class TestLambdaTerm(unittest.TestCase):
         self.assertEqual(lt.astTerms, [[{'x': 'lambda y: lambda z: x(z)(y(z))'}, {'y': 'lambda z: x(z)(y(z))'},
                                         {'z': 'x(z)(y(z))'}], [{'x': 'lambda y: x'}, {'y': 'x'}], [{'x': 'x'}]])
         print('lambda-term - SKI: ' + lt.term)
-        #print(lt.astTerms)
         if debug: print(lt.astTerms)
         if debug: print(lt.piProcessExpression)
-        #self.assertEqual(lt.piProcessExpression, 'a?x.a?b.[c?y.c?d.[e?z.e?f.[x(z)(y(z))!g](f)](d)](b)')
+        self.assertEqual('tbd', lt.piProcessExpression)
         print('>        expected: ' + 'tbd - not yet wired up')
         print('>>         actual: ' + lt.piProcessExpression)
         print('--------')

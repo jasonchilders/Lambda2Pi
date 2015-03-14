@@ -51,7 +51,7 @@ class LambdaTerm:
                       'x: _M_': '_c1_?x._c1_?_c2_.[_M_](_c2_)',
                       '_var_': '_var_!_c_',
                       '_M_ _N_':'new(_c1_,_c2_).(([_M_](_c1_)) | '
-                                          '(_c1_!_c2_._c2_!_c3_) |'
+                                          '(_c1_!_c2_._c2_!_c3_) | '
                                           '*((_c2_?_c4_).[_N_](_c4_))'}
 
     debug = False
@@ -99,11 +99,12 @@ class LambdaTerm:
                 value = lambdaTerm[colonIndex+1:].strip()
                 if value.startswith('('):      # remove leading and trailing parens from the term
                     value = LambdaTerm.stripParens(value)
-                #print(value)
+
                 lstack.append({key:value})
                 ltItems = []
                 if value.find('lambda') is not -1:
                     ltItems = LambdaTerm.parseLambdaTerm(value)
+
                 if len(ltItems) > 0:
                     if isinstance(ltItems, list):
                         for item in ltItems:
@@ -138,9 +139,6 @@ class LambdaTerm:
         return term
 
 
-
-
-
     @staticmethod
     def stripParens(lambdaTerm):
         term = lambdaTerm[0:]
@@ -158,7 +156,6 @@ class LambdaTerm:
         if endparenindex is -1:
             raise LambdaParsingError
 
-        #strippedTerm = lambdaTerm[1:endparenindex] + lambdaTerm[endparenindex+1:]
         return lambdaTerm[1:endparenindex] + lambdaTerm[endparenindex+1:]
 
 
@@ -220,11 +217,9 @@ class LambdaTerm:
 
     @staticmethod
     def newAgent():
-        #agentKeys = LambdaTerm.AGENTS.keys()
         agentKeys = sorted(LambdaTerm.AGENTS.items(), key=operator.itemgetter(0))
         agent = ''
         for ak in agentKeys:
-            #if LambdaTerm.AGENTS.get(ak) is 0:
             if ak[1] is 0:
                 agent = ak[0]
                 LambdaTerm.AGENTS[agent] = 1
@@ -256,7 +251,7 @@ class LambdaTerm:
             if i is 0 or isinstance(self.expressionValues[i], list):
                 exprKey = self.expressionKeys[i]
                 if exprKey is LambdaTerm.PI_EXPRESSIONS[3]:
-                    self.evaluateAgents(exprKey)
+                    self.appendEvaluatedTerm(self.evaluateAgents(exprKey))
                 else:
                     exprVal = self.expressionValues[i]
                     term = self.astTerms[i]
@@ -268,7 +263,7 @@ class LambdaTerm:
 
 
     #  x  ==  x!p
-    def evaluateVar(self, expressionKey, expressionValue, currentExpressionIndex):
+    def evaluateVar(self, expressionKey, expressionValue, currentExpressionIndex, terms=None):
         mappedTerm = LambdaTerm.EXPRESSION_MAP.get(expressionKey)
         evaluatedTerm = mappedTerm.replace('_var_', expressionValue)
         evaluatedTerm = evaluatedTerm.replace('_c_', LambdaTerm.newChannel())
@@ -277,10 +272,14 @@ class LambdaTerm:
 
 
     #  λx M  ==  p?x.p?q.[M](q)
-    def evaluateLambda(self, expressionKey, expressionValue, currentExpressionIndex):
+    def evaluateLambda(self, expressionKey, expressionValue, currentExpressionIndex, terms=None, expressionValues=None):
         mappedTerm = LambdaTerm.EXPRESSION_MAP.get(expressionKey)
         # _c1_?x._c1_?_c2_.[_M_](_c2_)
-        term = self.astTerms[currentExpressionIndex]
+        if terms is None:
+            term = self.astTerms[currentExpressionIndex]
+        else:
+            term = terms[currentExpressionIndex]
+
         if LambdaTerm.debug: print('(debug) evaluating term: ' + str(term))
         termInput = list(term.keys())[0]
         termExpr = term.get(termInput)
@@ -290,11 +289,13 @@ class LambdaTerm:
         evaluatedTerm = evaluatedTerm.replace('_c2_', LambdaTerm.newChannel())
         evaluatedSubterm = ''
         if expressionValue.find('lambda') is -1:    # in this case the value is a var
-            evaluatedSubterm = self.evaluateVar(LambdaTerm.PI_EXPRESSIONS[2], expressionValue, currentExpressionIndex+1)
+            evaluatedSubterm = self.evaluateVar(LambdaTerm.PI_EXPRESSIONS[2], expressionValue, currentExpressionIndex+1, terms)
         else:                                       # in this case the value is another lambda
+            if expressionValues is None:
+                expressionValues = self.expressionValues
             evaluatedSubterm = self.evaluateLambda(LambdaTerm.PI_EXPRESSIONS[1],
-                                                   self.expressionValues[currentExpressionIndex+1],
-                                                   currentExpressionIndex+1)
+                                                   expressionValues[currentExpressionIndex+1],
+                                                   currentExpressionIndex+1, terms, expressionValues)
         if len(evaluatedSubterm) > 0:
             evaluatedTerm = evaluatedTerm.replace('_M_', evaluatedSubterm)
 
@@ -302,23 +303,74 @@ class LambdaTerm:
         return evaluatedTerm
 
 
+    # Evaluate an Agent.  Example
+    #   For K:
+    #       expressionKeys = ['x: _M_', 'x: _M_']
+    #       expressionValues = ['lambda y: x', 'x']
+    def evaluateAgent(self, terms):
+        # determine expressionKeys for term
+        expressionKeys, expressionValues = LambdaTerm.getTermExpressionKeysValues(terms)
+        if LambdaTerm.debug: print('expressionKeys: ' + str(expressionKeys))
+        if LambdaTerm.debug: print('expressionValues: ' + str(expressionValues))
 
-    def evaluateAgent(self, expressionKey, expressionValue, term):
-        mappedTerm = LambdaTerm.EXPRESSION_MAP.get(expressionKey)
+        evaluatedTerm = ''
+        for i in range(len(expressionKeys)):
+            if i is 0 or isinstance(expressionValues[i], list):
+                exprKey = expressionKeys[i]
+                if exprKey is LambdaTerm.PI_EXPRESSIONS[3]:
+                    self.evaluateAgents(exprKey)
+                else:
+                    exprVal = expressionValues[i]
+                    term = terms[i]
+                    if exprKey is LambdaTerm.PI_EXPRESSIONS[2]:
+                        evaluatedTerm = self.evaluateVar(exprKey, exprVal, i, terms)
+                    elif exprKey is LambdaTerm.PI_EXPRESSIONS[1]:
+                        evaluatedTerm = self.evaluateLambda(exprKey, exprVal, i, terms, expressionValues)
+
+        if LambdaTerm.debug: print('(debug) evaluatedTerm: ' + evaluatedTerm)
+        return evaluatedTerm
+
+
+    @staticmethod
+    def getTermExpressionKeysValues(terms):
+        expressionKeys = []
+        expressionValues = []
+        for term in terms:
+            for key in term.keys():
+                if key is LambdaTerm.PI_EXPRESSIONS[2]:         # key is a variable
+                    expressionKeys.append(LambdaTerm.PI_EXPRESSIONS[2])
+                else:
+                    expressionKeys.append(LambdaTerm.PI_EXPRESSIONS[1])
+                value = term[key]
+                expressionValues.append(value)
+
+        return expressionKeys, expressionValues
+
 
 
     # evaluate M N  ==  new(a,b).(([M](a)) | (a!b.a!f) | *((b?c).[N](c))
-    def evaluateAgents(self, expressionKey):
+    def evaluateAgents(self, expressionKey, currentExpressionIndex=0):
         if expressionKey is LambdaTerm.PI_EXPRESSIONS[3]:
             mappedTerm = LambdaTerm.EXPRESSION_MAP.get(expressionKey)
             # new(_c1_,_c2_).(([_M_](_c1_)) | (_c1_!_c2_._c2_!_c3_) | *((_c2_?_c4_).[_N_](_c4_))
             evaluatedTerm = mappedTerm.replace('_c1_', LambdaTerm.newChannel())
-            evaluatedTerm = evaluatedTerm.replace('_c2)_', LambdaTerm.newChannel())
+            evaluatedTerm = evaluatedTerm.replace('_c2_', LambdaTerm.newChannel())
             evaluatedTerm = evaluatedTerm.replace('_c3_', LambdaTerm.newChannel())
             evaluatedTerm = evaluatedTerm.replace('_c4_', LambdaTerm.newChannel())
-            pass    # TODO: evaluate
+            evaluatedSubterm = ''
 
+            for i in range(len(self.astTerms)):
+                evaluatedSubterm = self.evaluateAgent(self.astTerms[i])
+                if len(evaluatedSubterm) > 0:
+                    if i is 0:
+                        evaluatedTerm = evaluatedTerm.replace('_M_', evaluatedSubterm)
+                    elif i is 1:
+                        evaluatedTerm = evaluatedTerm.replace('_N_', evaluatedSubterm)
 
+                if LambdaTerm.debug: print('(debug) evaluatedTerm: ' + evaluatedTerm)
+
+        if LambdaTerm.debug: print('(debug) evaluatedTerm: ' + evaluatedTerm)
+        return evaluatedTerm
 
 
     def appendEvaluatedTerm(self, evaluatedTerm):
@@ -327,8 +379,3 @@ class LambdaTerm:
                 self.piProcessExpression += '.' + evaluatedTerm
             else:
                 self.piProcessExpression += evaluatedTerm
-
-
-
-
-

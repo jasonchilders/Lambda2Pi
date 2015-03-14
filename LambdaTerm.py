@@ -323,7 +323,10 @@ class LambdaTerm:
                                                    expressionValues[currentExpressionIndex+1],
                                                    currentExpressionIndex+1, terms, expressionValues)
         if len(evaluatedSubterm) > 0:
-            evaluatedTerm = evaluatedTerm.replace('_M_', evaluatedSubterm)
+            if evaluatedTerm.find('[_M_]') is -1:
+                evaluatedTerm = evaluatedTerm.replace('_M_', evaluatedSubterm)
+            else:
+                evaluatedTerm = evaluatedTerm.replace('[_M_]', evaluatedSubterm)
 
         if LambdaTerm.debug: print('(debug) evaluatedTerm: ' + evaluatedTerm)
         return evaluatedTerm
@@ -389,9 +392,15 @@ class LambdaTerm:
                 evaluatedSubterm = self.evaluateAgent(self.astTerms[i])
                 if len(evaluatedSubterm) > 0:
                     if i is 0:
-                        evaluatedTerm = evaluatedTerm.replace('_M_', evaluatedSubterm)
+                        if evaluatedTerm.find('[_M_]') is -1:
+                            evaluatedTerm = evaluatedTerm.replace('_M_', evaluatedSubterm)
+                        else:
+                            evaluatedTerm = evaluatedTerm.replace('[_M_]', evaluatedSubterm)
                     elif i is 1:
-                        evaluatedTerm = evaluatedTerm.replace('_N_', evaluatedSubterm)
+                        if evaluatedTerm.find('[_N_]') is -1:
+                            evaluatedTerm = evaluatedTerm.replace('_N_', evaluatedSubterm)
+                        else:
+                            evaluatedTerm = evaluatedTerm.replace('[_N_]', evaluatedSubterm)
 
                 if LambdaTerm.debug: print('(debug) evaluatedTerm: ' + evaluatedTerm)
 

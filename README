@@ -29,3 +29,10 @@ I've taken a couple of shortcuts in the interest of time.  Trivial to resolve th
  in that case.  I suspect the conversion to the correct value here might also be trivial, but I'm not sure of what the
  translation rule for that is.
 
+
+To run the unittests do the following at the cli:
+
+    $ python3 -m unittest TestLambdaTerm
+
+This DOES NOT WORK with python2.  It borks on the 'λ' symbol in the class comments section of LambdaTerm.py.
+
